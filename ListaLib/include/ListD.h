@@ -863,7 +863,7 @@ void ListD<float>::readRow(){
 //Utilidades
 
 //Leer con separador
-template<>
+template <>
 void ListD<string>::readSep(char sep){
 
 	string linea;
@@ -880,6 +880,41 @@ void ListD<string>::readSep(char sep){
 }
 
 //Leer con separador para int
+template <>
+void ListD<int>::readSep(char sep){
+
+	string linea;
+	if(getline(cin, linea) && !linea.empty()){
+		string item;
+		istringstream ss(linea);
+
+		while(getline(ss,item,sep)){
+			if(!item.empty()){
+				int value = stringToInt(item);
+				this->insertBack(value);
+				}
+			}
+	}
+}
+
+//Leer con separador para float
+template <>
+void ListD<float>::readSep(char sep){
+
+	string linea;
+	if(getline(cin, linea) && !linea.empty()){
+		string item;
+		istringstream ss(linea);
+
+		while(getline(ss, item, sep)){
+			if(!item.empty()){
+				float value = stringToFloat(item);
+				this->insertBack(value);
+				}
+			}
+		}
+}
+
 
 //Mejoras esteticas
 
