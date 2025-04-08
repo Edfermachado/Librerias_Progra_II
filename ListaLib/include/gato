@@ -1,0 +1,55 @@
+#include <iostream>
+#include "ListD.h"
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int main() {
+
+  ListD<ListD<string> > apodos;
+        string apodo;
+        ListD<string> aux;
+        int indice = 0;
+
+        int numeroColumnas;
+        cin >> numeroColumnas;
+        cin.ignore();
+
+        for(int i = 0; i < numeroColumnas; i++){
+                apodos.insertBack(aux);
+        }
+
+        cout << apodos.getSize()<<endl;
+
+        while(getline(cin, apodo)){
+                istringstream ss(apodo);
+                string word;
+
+                while(ss >> word){
+                        //cout<<word<<endl;
+                        apodos[indice].insertFront(word);
+                        indice++;
+                        }
+			indice = 0;
+        }
+
+        for(int i = 0; i<numeroColumnas; i++){
+                apodos[i].show();
+                }
+
+	int acum = 0;
+	int temp = 0;
+	 for(int i = 0; i<apodos.getSize(); i++){
+		if(!apodos[i].isEmpty()){
+		temp = apodos[i].distanceDuplicates(apodos[i].getFront());
+		if(temp != -1){
+			acum = acum + temp;
+			}
+		apodos[i].deleteNode(0);
+			}
+		}
+		cout << "EL total es " << acum <<endl;
+
+    return 0;
+}

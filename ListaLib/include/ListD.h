@@ -45,6 +45,7 @@ public:
 	void modify(int pos, const T& e);
 	void bubbleSort();
 	void show() const;
+	T min() const;
 
 
 	//acceso
@@ -64,9 +65,14 @@ public:
 	void readRow();
 	void readLLRow();
 	void readLineToList(const string& unwantedSymbols);
+	void readSep(char sep);
 
 	//Mejora esteticas
+
+	//para modificar
 	T& operator[](int pos);
+
+	//para consultar
 	const T& operator[](int pos) const;
 
 	//Mejora de utilidad
@@ -210,7 +216,28 @@ void ListD<ListD<float> >::readLL(){
 
 //para carrear el taller
 
-//
+//encontrar minimo
+
+template <typename T>
+T ListD<T>::min() const{
+
+	if(size == 0){
+		throw ListEmptyException();
+		}
+
+	Node<T>* aux = head;
+	T minValue = aux->getInfo();
+
+	aux = aux->getNext();
+
+	while(aux != NULL){
+		if(aux->getInfo()<minValue){
+			minValue = aux->getInfo();
+			}
+		aux = aux->getNext();
+		}
+	return minValue;
+}
 
 
 
@@ -797,15 +824,62 @@ void ListD<T>::readRow(){
 		while(ss>>item){
 			insertBack(item);
 				}
-
 				}
 		}
 
 }
 
+template <>
+void ListD<int>::readRow(){
+
+	string linea;
+
+	if(getline(cin, linea) && !linea.empty()){
+		istringstream ss(linea);
+		string item;
+
+		while(ss>>item){
+			int value = stringToInt(item);
+			insertBack(value);
+			}
+		}
+	}
+
+template <>
+void ListD<float>::readRow(){
+	string linea;
+
+	if(getline(cin, linea) && !linea.empty()){
+		istringstream ss(linea);
+		string item;
+
+		while(ss>>item){
+			float value = stringToFloat(item);
+			insertBack(value);
+			}
+		}
+}
 
 //Utilidades
 
+//Leer con separador
+template<>
+void ListD<string>::readSep(char sep){
+
+	string linea;
+	if(getline(cin, linea) && !linea.empty()){
+		string item;
+		istringstream ss(linea);
+
+		while(getline(ss, item, sep)){
+			if(!item.empty()){
+				this->insertBack(item);
+				}
+			}
+	}
+}
+
+//Leer con separador para int
 
 //Mejoras esteticas
 
