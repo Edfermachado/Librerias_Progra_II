@@ -15,7 +15,7 @@ class Node{
 
 		Node<T>* getNext() const {return next;}
 		Node<T>* getPrev() const {return prev;}
-		T getInfo() const {return info;}
+		T& getInfo() {return info;}
 		void setInfo(const T& e){
 			info = e;
 				}

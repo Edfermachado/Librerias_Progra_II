@@ -11,6 +11,9 @@ public:
 	//constructor
 	LCP_Exception(const char* msg) throw() : message(msg){}
 
+	//destructor
+	virtual ~LCP_Exception() throw(){}
+
 	//metodo what() que devuelve el mensanje de error
 	virtual const char* what() const throw(){
 		return message;
@@ -34,6 +37,15 @@ class NotFound : public LCP_Exception{
 public:
 	NotFound() : LCP_Exception("ERROR: Value Not Found"){}
 
+};
+
+//Argumento invalido
+class InvalidArgument : public LCP_Exception{
+
+public:
+	InvalidArgument(const char* msg) throw() : LCP_Exception(msg){}
+
+	virtual ~InvalidArgument() throw(){}
 };
 
 #endif

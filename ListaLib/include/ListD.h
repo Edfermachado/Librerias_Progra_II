@@ -4,6 +4,15 @@
 #include "Nodo.h"
 #include <iostream>
 #include "LCP_Exceptions.h"
+#include <string>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <cstdlib>
+#include <cstring>
+
+
+using namespace std;
 
 template <typename T>
 
@@ -19,13 +28,18 @@ public:
 	ListD();
 	~ListD();
 
+
+	//Me quiero cortar un brazo
+	ListD(const ListD<T>& other);
+
 	// basiquitos
 	void insertFront(const T& value); //Listo
 	void insertBack(const T& value); //Listo
-	void deleteNode(const T& value);
+	void deleteElem(const T& value);
 	void insert(const T& value, int pos);
 	void clear();
 	bool isEmpty() const;
+	void deleteNode(int pos);
 	//void destroy();
 	void merge(const ListD<T>& listAux);
 	void modify(int pos, const T& e);
@@ -37,13 +51,71 @@ public:
 	T getFront() const;
 	T getBack() const;
 	T get(int pos) const;
+	T& getReference(int pos);
 	int search(const T& e) const;
 
 	//utilidades para carrear el taller
 	int getSize() const;
 	void invert();
 	void copy(const ListD<T>& listAux);
+	int distanceDuplicates(const T& value) const;
+	void readLL();
+	void showLL() const;
+	void readRow();
+	void readLLRow();
+	void readLineToList(const string& unwantedSymbols);
 
+	//Mejora esteticas
+	T& operator[](int pos);
+	const T& operator[](int pos) const;
+
+	//Mejora de utilidad
+	ListD<T>& operator=(const ListD<T>& other);
+
+
+
+//Si no implemento esto aquí se petatea todo );, por cuestiones de plantillas e instancias y todo eso xd
+	int stringToInt(const string& str){
+		istringstream iss(str);
+		int num;
+		if(iss>>num){
+		return num;
+		}else{
+		throw InvalidArgument(("string no convertible a int: " + str).c_str());
+		}
+	}
+
+	float stringToFloat(const string& str){
+		istringstream iss(str);
+		float num;
+		if(iss>>num){
+		return num;
+		}else{
+			throw InvalidArgument(("string no convertible a float: "+str).c_str());
+		}
+	}
+
+
+string cleanString(const string& dirtyString, const string& unwantedSymbol){
+
+	string cleanedString;
+
+	for(size_t i = 0; i < dirtyString.size(); i++){
+		bool isUnWanted = false;
+
+		for(size_t j = 0; j < unwantedSymbol.size(); j++){
+			if(dirtyString[i] == unwantedSymbol[j]){
+				isUnWanted = true;
+				break;
+			}
+		}
+
+		if(!isUnWanted){
+			cleanedString += dirtyString[i];
+			}
+	}
+		return cleanedString;
+}
 
 };
 
@@ -63,6 +135,264 @@ ListD<T>::~ListD() {
     head = tail = NULL;
     size = 0;
 }
+
+template <typename T>
+ListD<T>::ListD(const ListD<T>& other) : head(NULL), tail(NULL), size(0) {
+    if (other.head == NULL) {
+        // Si la lista original está vacía, simplemente salimos
+        return;
+    }
+
+    // Creamos un puntero auxiliar para recorrer la lista original
+    Node<T>* current = other.head;
+
+    // Recorremos la lista original y creamos los nuevos nodos
+    while (current != NULL) {
+        insertBack(current->getInfo());  // Insertamos al final de la nueva lista
+        current = current->getNext();   // Avanzamos al siguiente nodo
+    }
+}
+
+
+//readLL especializada para int
+template<>
+void ListD<ListD<int> >::readLL(){
+	int n;
+	string line;
+
+	cin >> n;
+	cin.ignore();
+
+	for(int i = 0; i<n; i++){
+		ListD<int> aux;
+		this->insertBack(aux);
+		}
+
+	while(getline(cin, line)){
+		istringstream ss(line);
+		string word;
+		int col = 0;
+
+		while(ss>>word){
+			int value = stringToInt(word);
+			(*this)[col].insertBack(value);
+			col++;
+		}
+	}
+}
+
+//readLL especializada para float
+template <>
+void ListD<ListD<float> >::readLL(){
+	int n;
+	string line;
+
+	cin >> n;
+	cin.ignore();
+
+	for(int i = 0; i<n; i++){
+		ListD<float> aux;
+		this->insertBack(aux);
+	}
+
+	while(getline(cin, line)){
+		istringstream ss(line);
+		string word;
+		int col = 0;
+
+		while(ss >> word){
+			float value = stringToFloat(word);
+			(*this)[col].insertBack(value);
+			col++;
+		}
+	}
+}
+
+//para carrear el taller
+
+//
+
+
+
+//leer lista con caracteres no deseados
+template <typename T>
+void ListD<T>::readLineToList(const string& unwantedSymbols){
+	string linea;
+
+	if(getline(cin, linea)){
+		if(!linea.empty()){
+			string cleanedLine = cleanString(linea, unwantedSymbols);
+
+			istringstream ss(cleanedLine);
+			string item;
+
+			while(ss>>item){
+				this->insertBack(item);
+				}
+			}
+		}
+}
+
+
+//leer lista de lista
+template <>
+void ListD<ListD<string> >::readLL() {
+    int n;  // Cantidad de columnas
+    string line;
+
+    // Leer la primera línea que indica la cantidad de columnas
+    cin >> n;
+    cin.ignore();  // Para ignorar el salto de línea que sigue al número
+
+    // Inicializar la lista de listas
+    for (int i = 0; i < n; i++) {
+        ListD<string> aux;
+        this->insertBack(aux);  // Crear una lista vacía para cada columna
+    }
+
+    // Leer el resto de las líneas (filas de datos)
+    while (getline(cin, line)) {
+        istringstream ss(line);  // Usar un stringstream para dividir la línea por espacios
+        string word;
+        int col = 0;  // Contador de columnas
+
+        // Procesar cada palabra en la línea
+        while (ss >> word) {
+            // Insertar la palabra en la columna correspondiente
+            (*this)[col].insertBack(word);  // Insertar al final de la sublista
+            col++;  // Avanzar a la siguiente columna
+        }
+    }
+}
+
+//Quiero llorar
+template <typename T>
+void ListD<T>::readLLRow(){
+	int n;
+	cin >> n;
+	cin.ignore();
+
+	for(int i = 0; i<n; i++){
+		//crear una lista para cada linea.
+		ListD<string> rowList;
+
+		// Usar el metodo readRow para llenar la fila
+		rowList.readRow();
+
+		// Insertar la lista de la fila en la lista principal
+		this->insertBack(rowList);
+		}
+}
+
+//version para int
+template<>
+void ListD<ListD<int> >::readLLRow() {
+    string linea;
+
+    // Leer hasta que no haya más líneas
+    while (getline(cin, linea)) {
+        if (!linea.empty()) {
+            istringstream ss(linea);  // Usamos un stringstream para dividir la línea
+            string item;
+            ListD<int> rowList;  // Esta lista almacenará los enteros de una fila.
+
+            // Procesamos cada palabra en la línea
+            while (ss >> item) {
+                    int value = stringToInt(item);  // Convertimos la palabra a int
+                    rowList.insertBack(value);  // Insertamos el int en la fila
+            }
+
+            // Una vez procesada la fila, la insertamos en la lista principal
+            this->insertBack(rowList);
+        }
+    }
+}
+
+template<>
+void ListD<ListD<float> >::readLLRow(){
+	string linea;
+
+	while(getline(cin, linea)){
+		if(!linea.empty()){
+		istringstream ss(linea);
+		string item;
+		ListD<float> rowList;
+
+		while(ss>>item){
+			float value = stringToFloat(item);
+			rowList.insertBack(value);
+			}
+			this->insertBack(rowList);
+			}
+		}
+}
+
+
+
+//Tambien carrear el taller
+template <typename T>
+void ListD<T>::showLL() const {
+	for(int i = 0; i<this->getSize(); i++){
+		cout<< "Columna " << i << ": ";
+		for(int j = 0; j < (*this)[i].getSize(); j++){
+			cout << (*this)[i][j] << " ";
+			}
+			cout << endl;
+		}
+}
+
+
+//aaaaaaaaaaaaaaaa
+template <typename T>
+bool ListD<T>::isEmpty() const {
+	return head == NULL;
+	}
+
+//Implementacion de eliminar por posicion
+
+template <typename T>
+void ListD<T>::deleteNode(int pos){
+
+	if(!head){
+		throw ListEmptyException();
+		}
+	if(pos < 0 || pos >= size){
+		throw IndexOut();
+	}
+
+	Node<T>* aux = head;
+
+	if(pos == 0){
+		head = aux->getNext();
+		if(head){
+			head->setPrev(NULL);
+		}else{
+			tail = NULL;
+		}
+	delete aux;
+	size --;
+	return;
+	}
+
+	for(int i = 0; i<pos; i++){
+		aux = aux->getNext();
+		}
+
+	if(aux->getNext()){
+		aux->getNext()->setPrev(aux->getPrev());
+		} else {
+		tail = aux->getPrev();
+	}
+
+	if(aux->getPrev()){
+		aux->getPrev()->setNext(aux->getNext());
+	}
+
+	delete aux;
+	size--;
+
+}
+
 
 // Implementacion de insertFront
 
@@ -136,10 +466,11 @@ void ListD<T>::insert(const T& value, int pos){
 	size++;
 }
 
+
 //Implementacion DeleteNode
 template <typename T>
 
-void ListD<T>::deleteNode(const T& value){
+void ListD<T>::deleteElem(const T& value){
 
 	//caso Lista vacia
 	if(!head){
@@ -225,7 +556,27 @@ T ListD<T>::get(int pos) const{
     return aux->getInfo();
 }
 
-//Implementacion mostrar lista
+template <typename T>
+T& ListD<T>::getReference(int pos) {
+
+    if (!head) {
+        throw ListEmptyException();
+    }
+
+    if (pos < 0 || pos >= size) {  // Cambié "pos > 0 size" a "pos >= size"
+        throw IndexOut();
+    }
+
+    Node<T>* aux = head;
+
+    for (int i = 0; i < pos; i++) {
+        aux = aux->getNext();
+    }
+
+    return aux->getInfo();  // Devuelves una referencia al valor almacenado en el nodo
+}
+
+
 template <typename T>
 void ListD<T>::show() const{
 	if(!head){
@@ -394,6 +745,97 @@ void ListD<T>::copy(const ListD<T>& listAux){
 	}
 }
 
+//Sacado del taller del 2021 xd
+
+template <typename T>
+
+int ListD<T>::distanceDuplicates(const T& value) const{
+
+	if(head == NULL){
+		throw ListEmptyException();
+	}
+
+
+	Node<T>* aux = head;
+	int firstPos = -1;
+	int lastPos = -1;
+	int pos = 0;
+
+	while(aux != NULL){
+		if(aux->getInfo() == value){
+			if(firstPos == -1){
+				firstPos = pos;
+			}
+		lastPos = pos;
+		}
+		aux = aux->getNext();
+		pos++;
+	}
+
+	if(firstPos != -1 && lastPos != -1 && firstPos != lastPos){
+		return lastPos - firstPos - 1;
+	}
+
+	return -1;
+
+}
+
+
+
+//implementacion de readRow
+template <typename T>
+void ListD<T>::readRow(){
+
+	clear();
+
+	string linea;
+
+	if(getline(cin, linea)){
+		if(!linea.empty()){
+			istringstream ss(linea);
+			string item;
+		while(ss>>item){
+			insertBack(item);
+				}
+
+				}
+		}
+
+}
+
+
+//Utilidades
+
+
+//Mejoras esteticas
+
+template <typename T>
+T& ListD<T>::operator[](int pos){
+	return this->getReference(pos);
+}
+
+template <typename T>
+ListD<T>& ListD<T>::operator=(const ListD<T>& other){
+	if(this != &other){
+		clear();
+		copy(other);
+	}
+	return *this;
+}
+
+template <typename T>
+const T& ListD<T>::operator[](int pos) const{
+
+	if(pos < 0 || pos >= size){
+		throw IndexOut();
+		}
+
+	Node<T>* aux = head;
+	for(int i = 0; i<pos; i++){
+		aux = aux->getNext();
+		}
+	return aux->getInfo();
+}
 
 
 
