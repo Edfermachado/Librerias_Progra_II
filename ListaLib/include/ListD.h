@@ -48,6 +48,8 @@ public:
 	T min() const;
 	T max() const;
 
+
+	//
 	//acceso
 	T getFront() const;
 	T getBack() const;
