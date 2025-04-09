@@ -66,6 +66,8 @@ public:
 	void readLLRow();
 	void readLineToList(const string& unwantedSymbols);
 	void readSep(char sep);
+	void copyInterval(const T& start, const T& end, ListD<T>& result) const;
+
 
 	//Mejora esteticas
 
@@ -215,6 +217,33 @@ void ListD<ListD<float> >::readLL(){
 }
 
 //para carrear el taller
+
+//encontrar intervalo
+template <typename T>
+void ListD<T>::copyInterval(const T& start, const T& end, ListD<T>& result) const{
+
+	bool inRange = false;
+	Node<T>* current = head;
+
+	while(current != NULL){
+		T value = current->getInfo();
+
+		if(value == start){
+			inRange = true;
+		}
+
+		if(inRange){
+			result.insertBack(value);
+		}
+
+		if(value == end && inRange){
+			break;
+			}
+
+		current = current->getNext();
+	}
+}
+
 
 //encontrar minimo
 
