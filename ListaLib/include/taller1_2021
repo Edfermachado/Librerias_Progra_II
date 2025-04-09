@@ -1,0 +1,56 @@
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include "ListD.h"
+
+using namespace std;
+
+int main() {
+    ListD<ListD<string> > apodos;
+    string linea, palabra;
+    int numeroColumnas;
+
+    cin >> numeroColumnas;
+    cin.ignore();
+
+    for (int i = 0; i < numeroColumnas; i++) {
+        ListD<string> aux;
+        apodos.insertBack(aux);
+    }
+
+    // Leer y llenar las columnas
+    while (getline(cin, linea)) {
+        istringstream ss(linea);
+        int col = 0;
+        while (ss >> palabra && col < numeroColumnas) {
+            apodos[col].insertFront(palabra);
+            col++;
+        }
+    }
+
+	//ofstream outFile("output.txt");
+
+    // Procesar las listas
+    //int acum = 0;
+    for (int i = 0; i < apodos.getSize(); i++) {
+       	int acum = 0;
+	 while (!apodos[i].isEmpty()) {
+            string actual = apodos[i].getFront();
+            int temp = apodos[i].distanceDuplicates(actual);
+
+            if (temp != -1) {
+                //cout << "Sublista " << i << ": \"" << actual << "\" tiene distancia " << temp << endl;
+                acum += temp;
+            }
+
+            apodos[i].deleteNode(0);
+        }
+    	cout << "Total de latigazos en la sublista " << i <<": "<< acum << endl;
+	//outFile <<acum << endl;
+	}
+	//outFile.close();
+    //cout << "EL total es " << acum << endl;
+    return 0;
+}
+
