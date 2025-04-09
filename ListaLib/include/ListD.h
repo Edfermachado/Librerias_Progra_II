@@ -46,7 +46,7 @@ public:
 	void bubbleSort();
 	void show() const;
 	T min() const;
-
+	T max() const;
 
 	//acceso
 	T getFront() const;
@@ -297,6 +297,26 @@ T ListD<T>::min() const{
 	return minValue;
 }
 
+//encontrar maximo
+template <typename T>
+T ListD<T>::max() const{
+	if(size == 0){
+		throw ListEmptyException();
+		}
+
+	Node<T>* aux = head;
+	T maxValue = aux -> getInfo();
+
+	aux = aux->getNext();
+
+	while(aux != NULL){
+		if(aux->getInfo()>maxValue){
+			maxValue = aux->getInfo();
+		}
+		aux = aux->getNext();
+	}
+	return maxValue;
+}
 
 
 //leer lista con caracteres no deseados
