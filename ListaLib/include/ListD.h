@@ -67,6 +67,7 @@ public:
 	void readLineToList(const string& unwantedSymbols);
 	void readSep(char sep);
 	void copyInterval(const T& start, const T& end, ListD<T>& result) const;
+	void copyIntervalExclusive(const T& start, const T& end, ListD<T>& result) const;
 
 
 	//Mejora esteticas
@@ -244,6 +245,34 @@ void ListD<T>::copyInterval(const T& start, const T& end, ListD<T>& result) cons
 	}
 }
 
+//intervalo sin extremos
+template <typename T>
+void ListD<T>::copyIntervalExclusive(const T& start, const T& end, ListD<T>& result)const{
+
+	bool inRange = false;
+	Node<T>* current = head;
+
+	while(current != NULL){
+
+		T value = current -> getInfo();
+
+		if(value == start){
+			inRange = true;
+			current = current->getNext();
+			continue;
+			}
+
+		if(value == end && inRange){
+			break;
+		}
+
+		if(inRange){
+			result.insertBack(value);
+		}
+
+		current = current->getNext();
+	}
+}
 
 //encontrar minimo
 
